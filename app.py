@@ -106,31 +106,39 @@ def student_entry(school_id):
 @app.route('/responses/<int:school_id>', methods=['GET', 'POST'])
 def responses(school_id):
     students = Students.query.filter_by(school_id=school_id).all()
+    student_ids = [student.student_id for student in students]
+
+    # Fetch all existing responses for students in this school
+    existing_responses = {sr.student_id: sr for sr in StudentResponses.query.filter(StudentResponses.student_id.in_(student_ids)).all()}
 
     if request.method == 'POST':
         for student in students:
-            # Check if response exists for this student
-            student_response = StudentResponses.query.filter_by(student_id=student.student_id).first()
+            student_response = existing_responses.get(student.student_id)
 
             if not student_response:
-                # Create new response
                 student_response = StudentResponses(student_id=student.student_id)
                 db.session.add(student_response)
 
-            # Update each question's response
-            for i in range(1, 21):
-                checkbox_name = f'Q{i}_{student.student_id}'
-                # Convert checkbox value to True/False in database
-                checkbox_value = request.form.get(checkbox_name) == 'on'
-                setattr(student_response, f'Q{i}', checkbox_value)
+            for i in range(1, 21):  # Loop through 20 questions
+                correct_name = f'correct_{i}_{student.student_id}'
+                incorrect_name = f'incorrect_{i}_{student.student_id}'
+                partial_name = f'partial_{i}_{student.student_id}'
+
+                # Determine which checkbox is selected
+                if correct_name in request.form:
+                    setattr(student_response, f'Q{i}', 'correct')
+                elif incorrect_name in request.form:
+                    setattr(student_response, f'Q{i}', 'incorrect')
+                elif partial_name in request.form:
+                    setattr(student_response, f'Q{i}', 'partial')
+                else:
+                    setattr(student_response, f'Q{i}', None)  # No selection
 
         db.session.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('responses', school_id=school_id))
 
-    # Get existing responses
-    student_responses = {sr.student_id: sr for sr in StudentResponses.query.all()}
+    return render_template('responses.html', students=students, student_responses=existing_responses)
 
-    return render_template('responses.html', students=students, student_responses=student_responses)
 
 if __name__ == '__main__':
     with app.app_context():

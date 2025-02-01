@@ -14,6 +14,14 @@ form {
     padding: 15px;
     border-radius: 12px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Ensures scrollability if content overflows */
+}
+
+/* Table Container */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Enables horizontal scrolling on mobile */
+    padding: 10px;
 }
 
 /* Table Styling */
@@ -21,7 +29,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background: #ffffff;
-    table-layout: fixed; /* This ensures equal column width */
+    table-layout: fixed; /* Ensures equal column width */
 }
 
 table, th, td {
@@ -32,21 +40,22 @@ th, td {
     padding: 6px 2px;
     text-align: center;
     font-size: 12px;
-    width: calc(95% / 20); /* Distributes space equally among question columns */
+    white-space: nowrap; /* Prevents text from wrapping */
 }
 
 /* Student Name Column */
 th:first-child,
 td:first-child {
-    width: 5%; /* Fixed width for student name */
+    width: 15%; /* Increased for better readability */
     text-align: left;
     padding-left: 5px;
+    font-weight: bold;
 }
 
 /* Checkbox Styling */
 input[type="checkbox"] {
-    width: 12px;
-    height: 12px;
+    width: 16px; /* Increased for better mobile interaction */
+    height: 16px;
     margin: 0;
     cursor: pointer;
     vertical-align: middle;
@@ -69,13 +78,17 @@ th {
 button {
     background-color: #222;
     color: #fff;
-    padding: 8px 12px;
+    padding: 10px 15px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     transition: all 0.3s ease;
     margin-top: 15px;
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
 }
 
 button:hover {
@@ -87,15 +100,29 @@ tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-/* Responsive Adjustments for very small screens */
-@media screen and (max-width: 1024px) {
-    th, td {
-        padding: 4px 1px;
-        font-size: 11px;
+/* Responsive Adjustments for Mobile Screens */
+@media screen and (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
     }
-    
+
+    table {
+        width: 100%;
+        min-width: 600px; /* Ensures table does not shrink too much */
+    }
+
+    th, td {
+        font-size: 11px;
+        padding: 4px 2px;
+    }
+
     input[type="checkbox"] {
-        width: 10px;
-        height: 10px;
+        width: 14px; /* Slightly smaller for compact layout */
+        height: 14px;
+    }
+
+    button {
+        font-size: 13px;
+        padding: 8px 12px;
     }
 }

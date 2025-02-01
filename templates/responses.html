@@ -1,40 +1,63 @@
+
 <!-- responses.html -->
 <link rel="stylesheet" href="{{ url_for('static', filename='stylethree.css') }}">
+
 <div class="table-container">
     <form method="POST">
         <table border="1">
             <thead>
                 <tr>
                     <th>Student Name</th>
-                    {% for i in range(1, 21) %}
-                        <th>Q{{ i }}</th>
-                    {% endfor %}
+                    <th>Question</th>
+                    <th>Correct</th>
+                    <th>Incorrect</th>
+                    <th>Partially Correct</th>
                 </tr>
             </thead>
             <tbody>
                 {% for student in students %}
-                    <tr>
-                        <td>{{ student.full_name }}</td>
-                        {% for i in range(1, 21) %}
-                            {% set checkbox_name = "Q" ~ i ~ "_" ~ student.student_id %}
+                    {% for i in range(1, 21) %}
+                        <tr>
+                            <td>{{ student.full_name }}</td>
+                            <td>Q{{ i }}</td>
+
+                            {% set response = student_responses.get(student.student_id) %}
+                            {% set current_answer = getattr(response, 'Q' ~ i, None) if response else None %}
+
                             <td>
                                 <input 
                                     type="checkbox" 
-                                    name="{{ checkbox_name }}" 
-                                    id="{{ checkbox_name }}"
-                                    {% if student_responses.get(student.student_id) and 
-                                          getattr(student_responses.get(student.student_id), 'Q' ~ i) %} 
-                                        checked 
-                                    {% endif %}
+                                    name="correct_{{ i }}_{{ student.student_id }}" 
+                                    id="correct_{{ i }}_{{ student.student_id }}"
+                                    {% if current_answer == 'correct' %} checked {% endif %}
                                 >
-                                <label for="{{ checkbox_name }}">✔</label>
+                                <label for="correct_{{ i }}_{{ student.student_id }}">✔</label>
                             </td>
-                        {% endfor %}
-                    </tr>
+
+                            <td>
+                                <input 
+                                    type="checkbox" 
+                                    name="incorrect_{{ i }}_{{ student.student_id }}" 
+                                    id="incorrect_{{ i }}_{{ student.student_id }}"
+                                    {% if current_answer == 'incorrect' %} checked {% endif %}
+                                >
+                                <label for="incorrect_{{ i }}_{{ student.student_id }}">❌</label>
+                            </td>
+
+                            <td>
+                                <input 
+                                    type="checkbox" 
+                                    name="partial_{{ i }}_{{ student.student_id }}" 
+                                    id="partial_{{ i }}_{{ student.student_id }}"
+                                    {% if current_answer == 'partial' %} checked {% endif %}
+                                >
+                                <label for="partial_{{ i }}_{{ student.student_id }}">➖</label>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
             </tbody>
         </table>
         <button type="submit">Submit Responses</button>
     </form>
 </div>
-
