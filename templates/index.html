@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Info</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    <h2>Enter School Information</h2>
+    <form action="/" method="post">
+        <label>Name: <input type="text" name="name" required></label><br>
+        <label>School: <input type="text" name="school" required></label><br>
+        <label>Number of Boys: <input type="number" name="num_boys" required></label><br>
+        <label>Number of Girls: <input type="number" name="num_girls" required></label><br>
+        <button type="submit">Next</button>
+    </form>
+</body>
+</html>

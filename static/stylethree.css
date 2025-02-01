@@ -1,0 +1,101 @@
+/* General Styles */
+body {
+    background-color: #f4f4f4;
+    font-family: 'Poppins', sans-serif;
+    color: #333;
+    padding: 10px;
+    margin: 0;
+}
+
+/* Form Styling */
+form {
+    width: 100%;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    table-layout: fixed; /* This ensures equal column width */
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 6px 2px;
+    text-align: center;
+    font-size: 12px;
+    width: calc(95% / 20); /* Distributes space equally among question columns */
+}
+
+/* Student Name Column */
+th:first-child,
+td:first-child {
+    width: 5%; /* Fixed width for student name */
+    text-align: left;
+    padding-left: 5px;
+}
+
+/* Checkbox Styling */
+input[type="checkbox"] {
+    width: 12px;
+    height: 12px;
+    margin: 0;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+td label {
+    display: none;
+}
+
+/* Header Styling */
+th {
+    background-color: #333;
+    color: #fff;
+    font-weight: 600;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Submit Button */
+button {
+    background-color: #222;
+    color: #fff;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Zebra Striping */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Responsive Adjustments for very small screens */
+@media screen and (max-width: 1024px) {
+    th, td {
+        padding: 4px 1px;
+        font-size: 11px;
+    }
+    
+    input[type="checkbox"] {
+        width: 10px;
+        height: 10px;
+    }
+}

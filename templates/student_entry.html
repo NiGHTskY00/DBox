@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Entry</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styletwoo.css') }}">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let studentContainer = document.getElementById("students");
+
+            function addStudentRow() {
+                let row = document.createElement("div");
+                row.className = "student-row p-3 border rounded mb-2";
+                row.innerHTML = `
+                    <label>Full Name: <input type="text" name="full_name" required></label>
+                    <label>Father's Name: <input type="text" name="father_name" required></label>
+                    <label>Mother's Name: <input type="text" name="mother_name" required></label>
+                    <label>DOB: <input type="date" name="dob" required></label>
+                    <label>Weight: <input type="number" name="weight" required></label>
+                    <label>Height: <input type="number" name="height" required></label>
+                    <label>Gender: 
+                        <select name="gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </label>
+                    <hr>
+                `;
+                studentContainer.appendChild(row);
+            }
+
+            function removeStudentRow() {
+                let rows = document.querySelectorAll(".student-row");
+                if (rows.length > 1) {
+                    studentContainer.removeChild(rows[rows.length - 1]);  // Remove last row
+                }
+            }
+
+            // Ensure at least one student entry is present
+            addStudentRow();
+
+            document.getElementById("add-student").addEventListener("click", addStudentRow);
+            document.getElementById("remove-student").addEventListener("click", removeStudentRow);
+        });
+    </script>
+</head>
+<body>
+    <h2>Enter Student Details</h2>
+    <form action="/student_entry/{{ school_id }}" method="post">
+        <div id="students"></div>
+        <button type="button" id="add-student">Add Student</button>
+        <button type="button" id="remove-student">Delete Last Entry</button>
+        <br><br>
+        <button type="submit">Next</button>
+    </form>
+</body>
+</html>
+

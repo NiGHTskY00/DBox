@@ -1,0 +1,40 @@
+<!-- responses.html -->
+<link rel="stylesheet" href="{{ url_for('static', filename='stylethree.css') }}">
+<div class="table-container">
+    <form method="POST">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    {% for i in range(1, 21) %}
+                        <th>Q{{ i }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.full_name }}</td>
+                        {% for i in range(1, 21) %}
+                            {% set checkbox_name = "Q" ~ i ~ "_" ~ student.student_id %}
+                            <td>
+                                <input 
+                                    type="checkbox" 
+                                    name="{{ checkbox_name }}" 
+                                    id="{{ checkbox_name }}"
+                                    {% if student_responses.get(student.student_id) and 
+                                          getattr(student_responses.get(student.student_id), 'Q' ~ i) %} 
+                                        checked 
+                                    {% endif %}
+                                >
+                                <label for="{{ checkbox_name }}">✔</label>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Submit Responses</button>
+    </form>
+</div>
+
