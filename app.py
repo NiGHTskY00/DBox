@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 # Configure Flask and SQLAlchemy
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'fallback-key-for-development')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rushi:531241789@localhost/flaskappdb'
 
 # Check if running on Render (DATABASE_URL will be set in Render's environment variables)
