@@ -4,25 +4,32 @@ from flask_sqlalchemy import SQLAlchemy
 
 # Configure Flask and SQLAlchemy
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'supersecretkey'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rushi:531241789@localhost/flaskappdb'
 
 # Check if running on Render (DATABASE_URL will be set in Render's environment variables)
-database_url = os.getenv('DATABASE_URL')
+#database_url = os.getenv('DATABASE_URL')
 
 # Log the database URL to debug the issue
-print("DATABASE_URL:", database_url)
+#print("DATABASE_URL:", database_url)
 
-if database_url:
+#if database_url:
     # Use Render's external PostgreSQL database URL
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url.replace("postgres://", "postgresql://", 1)
-else:
+    #app.config['SQLALCHEMY_DATABASE_URI'] = database_url.replace("postgres://", "postgresql://", 1)
+    #print("if")
+#else:
     # Use Render's external database URL for local development
-    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://rushi:yi73COKlyyUBFwRPclWqkBC8fgbyNzNH@dpg-cuereg5ds78s73fb0fe0-a.oregon-postgres.render.com/taskdb_x11i"
+    #app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://rushi:yi73COKlyyUBFwRPclWqkBC8fgbyNzNH@dpg-cuereg5ds78s73fb0fe0-a.oregon-postgres.render.com/taskdb_x11i"
+    #print("else")
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database
 db = SQLAlchemy(app)
+
+# Custom Jinja filter to mimic Python's getattr
+@app.template_filter('getattr')
+def getattr_filter(obj, attr_name):
+    return getattr(obj, attr_name, None)
 
 # Database Models
 class SchoolInfo(db.Model):
@@ -31,6 +38,9 @@ class SchoolInfo(db.Model):
     school = db.Column(db.String(100), nullable=False)
     num_boys = db.Column(db.Integer, nullable=False)
     num_girls = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f'<SchoolInfo {self.name}>'
 
 class Students(db.Model):
     student_id = db.Column(db.Integer, primary_key=True)
@@ -43,29 +53,34 @@ class Students(db.Model):
     height = db.Column(db.Float, nullable=False)
     gender = db.Column(db.String(10), nullable=False)
 
+    def __repr__(self):
+        return f'<Student {self.full_name}>'
+
 class StudentResponses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
-    Q1 = db.Column(db.Boolean, default=False)
-    Q2 = db.Column(db.Boolean, default=False)
-    Q3 = db.Column(db.Boolean, default=False)
-    Q4 = db.Column(db.Boolean, default=False)
-    Q5 = db.Column(db.Boolean, default=False)
-    Q6 = db.Column(db.Boolean, default=False)
-    Q7 = db.Column(db.Boolean, default=False)
-    Q8 = db.Column(db.Boolean, default=False)
-    Q9 = db.Column(db.Boolean, default=False)
-    Q10 = db.Column(db.Boolean, default=False)
-    Q11 = db.Column(db.Boolean, default=False)
-    Q12 = db.Column(db.Boolean, default=False)
-    Q13 = db.Column(db.Boolean, default=False)
-    Q14 = db.Column(db.Boolean, default=False)
-    Q15 = db.Column(db.Boolean, default=False)
-    Q16 = db.Column(db.Boolean, default=False)
-    Q17 = db.Column(db.Boolean, default=False)
-    Q18 = db.Column(db.Boolean, default=False)
-    Q19 = db.Column(db.Boolean, default=False)
-    Q20 = db.Column(db.Boolean, default=False)
+    Q1 = db.Column(db.Float, default=0.0)
+    Q2 = db.Column(db.Float, default=0.0)
+    Q3 = db.Column(db.Float, default=0.0)
+    Q4 = db.Column(db.Float, default=0.0)
+    Q5 = db.Column(db.Float, default=0.0)
+    Q6 = db.Column(db.Float, default=0.0)
+    Q7 = db.Column(db.Float, default=0.0)
+    Q8 = db.Column(db.Float, default=0.0)
+    Q9 = db.Column(db.Float, default=0.0)
+    Q10 = db.Column(db.Float, default=0.0)
+    Q11 = db.Column(db.Float, default=0.0)
+    Q12 = db.Column(db.Float, default=0.0)
+    Q13 = db.Column(db.Float, default=0.0)
+    Q14 = db.Column(db.Float, default=0.0)
+    Q15 = db.Column(db.Float, default=0.0)
+    Q16 = db.Column(db.Float, default=0.0)
+    Q17 = db.Column(db.Float, default=0.0)
+    Q18 = db.Column(db.Float, default=0.0)
+    Q19 = db.Column(db.Float, default=0.0)
+    Q20 = db.Column(db.Float, default=0.0)
+    def __repr__(self):
+        return f'<StudentResponses {self.student_id}>'
 
 # Routes
 @app.route('/', methods=['GET', 'POST'])
@@ -107,36 +122,28 @@ def student_entry(school_id):
 def responses(school_id):
     students = Students.query.filter_by(school_id=school_id).all()
     student_ids = [student.student_id for student in students]
-
-    # Fetch all existing responses for students in this school
     existing_responses = {sr.student_id: sr for sr in StudentResponses.query.filter(StudentResponses.student_id.in_(student_ids)).all()}
 
     if request.method == 'POST':
+        # Debug: Print submitted form data to console.
+        print("Form Data:", request.form)
+        
         for student in students:
             student_response = existing_responses.get(student.student_id)
-
             if not student_response:
                 student_response = StudentResponses(student_id=student.student_id)
                 db.session.add(student_response)
-
-            for i in range(1, 21):  # Loop through 20 questions
-                correct_name = f'correct_{i}_{student.student_id}'
-                incorrect_name = f'incorrect_{i}_{student.student_id}'
-                partial_name = f'partial_{i}_{student.student_id}'
-
-                # Determine which checkbox is selected
-                if correct_name in request.form:
-                    setattr(student_response, f'Q{i}', 'correct')
-                elif incorrect_name in request.form:
-                    setattr(student_response, f'Q{i}', 'incorrect')
-                elif partial_name in request.form:
-                    setattr(student_response, f'Q{i}', 'partial')
-                else:
-                    setattr(student_response, f'Q{i}', None)  # No selection
-
+            for i in range(1, 21):
+                response_key = f'response_{i}_{student.student_id}'
+                response_value = request.form.get(response_key, "0")
+                try:
+                    numeric_value = float(response_value)
+                except ValueError:
+                    numeric_value = 0.0
+                setattr(student_response, f'Q{i}', numeric_value)
         db.session.commit()
         return redirect(url_for('responses', school_id=school_id))
-
+    
     return render_template('responses.html', students=students, student_responses=existing_responses)
 
 

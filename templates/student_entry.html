@@ -5,56 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Entry</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styletwoo.css') }}">
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let studentContainer = document.getElementById("students");
-
-            function addStudentRow() {
-                let row = document.createElement("div");
-                row.className = "student-row p-3 border rounded mb-2";
-                row.innerHTML = `
-                    <label>Full Name: <input type="text" name="full_name" required></label>
-                    <label>Father's Name: <input type="text" name="father_name" required></label>
-                    <label>Mother's Name: <input type="text" name="mother_name" required></label>
-                    <label>DOB: <input type="date" name="dob" required></label>
-                    <label>Weight: <input type="number" name="weight" required></label>
-                    <label>Height: <input type="number" name="height" required></label>
-                    <label>Gender: 
-                        <select name="gender" required>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </label>
-                    <hr>
-                `;
-                studentContainer.appendChild(row);
-            }
-
-            function removeStudentRow() {
-                let rows = document.querySelectorAll(".student-row");
-                if (rows.length > 1) {
-                    studentContainer.removeChild(rows[rows.length - 1]);  // Remove last row
-                }
-            }
-
-            // Ensure at least one student entry is present
-            addStudentRow();
-
-            document.getElementById("add-student").addEventListener("click", addStudentRow);
-            document.getElementById("remove-student").addEventListener("click", removeStudentRow);
-        });
-    </script>
+    <style>
+        .excel-table { width: 100%; border-collapse: collapse; }
+        .excel-table td { padding: 5px; border: 1px solid #ccc; position: relative; }
+        .excel-table input, .excel-table select { 
+            width: 100%; 
+            border: none; 
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+        .unit-label {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
     <h2>Enter Student Details</h2>
     <form action="/student_entry/{{ school_id }}" method="post">
-        <div id="students"></div>
-        <button type="button" id="add-student">Add Student</button>
-        <button type="button" id="remove-student">Delete Last Entry</button>
-        <br><br>
+        <table class="excel-table" id="studentTable">
+            <thead>
+                <tr>
+                    <th scope="col">Full Name</th>
+                    <th scope="col">Father's Name</th>
+                    <th scope="col">Mother's Name</th>
+                    <th scope="col">DOB</th>
+                    <th scope="col">Weight (kg)</th>
+                    <th scope="col">Height (cm)</th>
+                    <th scope="col">Gender</th>
+                </tr>
+            </thead>
+            <tbody id="studentBody">
+                <tr>
+                    <td>
+                        <label class="sr-only" for="full_name_1">Full Name</label>
+                        <input type="text" id="full_name_1" name="full_name" required 
+                               placeholder="Full Name" pattern="^[A-Za-z\s]+$" 
+                               onkeyup="this.value = capitalizeFirstLetter(this.value)">
+                    </td>
+                    <td>
+                        <label class="sr-only" for="father_name_1">Father's Name</label>
+                        <input type="text" id="father_name_1" name="father_name" required 
+                               placeholder="Father's Name" pattern="^[A-Za-z\s]+$"
+                               onkeyup="this.value = capitalizeFirstLetter(this.value)">
+                    </td>
+                    <td>
+                        <label class="sr-only" for="mother_name_1">Mother's Name</label>
+                        <input type="text" id="mother_name_1" name="mother_name" required 
+                               placeholder="Mother's Name" pattern="^[A-Za-z\s]+$"
+                               onkeyup="this.value = capitalizeFirstLetter(this.value)">
+                    </td>
+                    <td>
+                        <label class="sr-only" for="dob_1">Date of Birth</label>
+                        <input type="date" id="dob_1" name="dob" required title="Date of Birth">
+                    </td>
+                    <td>
+                        <label class="sr-only" for="weight_1">Weight</label>
+                        <input type="number" id="weight_1" name="weight" required 
+                               placeholder="Weight" min="0" max="150" step="0.1">
+                        <span class="unit-label">kg</span>
+                    </td>
+                    <td>
+                        <label class="sr-only" for="height_1">Height</label>
+                        <input type="number" id="height_1" name="height" required 
+                               placeholder="Height" min="0" max="250" step="0.1">
+                        <span class="unit-label">cm</span>
+                    </td>
+                    <td>
+                        <label class="sr-only" for="gender_1">Gender</label>
+                        <select id="gender_1" name="gender" required title="Select Gender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" onclick="addRow()">Add Row</button>
+        <button type="button" onclick="removeRow()">Delete Last Row</button>
         <button type="submit">Next</button>
     </form>
+
+    <script>
+        let rowCounter = 2;
+        
+        function capitalizeFirstLetter(string) {
+            return string.replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function addRow() {
+            const tbody = document.getElementById('studentBody');
+            const newRow = tbody.insertRow();
+            const fields = [
+                {type: 'text', name: 'full_name', placeholder: 'Full Name', pattern: '^[A-Za-z\\s]+$', capitalize: true},
+                {type: 'text', name: 'father_name', placeholder: 'Father\'s Name', pattern: '^[A-Za-z\\s]+$', capitalize: true},
+                {type: 'text', name: 'mother_name', placeholder: 'Mother\'s Name', pattern: '^[A-Za-z\\s]+$', capitalize: true},
+                {type: 'date', name: 'dob', title: 'Date of Birth'},
+                {type: 'number', name: 'weight', placeholder: 'Weight', min: 0, max: 150, step: 0.1, unit: 'kg'},
+                {type: 'number', name: 'height', placeholder: 'Height', min: 0, max: 250, step: 0.1, unit: 'cm'},
+                {type: 'select', name: 'gender', title: 'Select Gender'}
+            ];
+
+            fields.forEach(field => {
+                const cell = newRow.insertCell();
+                if (field.type === 'select') {
+                    const label = document.createElement('label');
+                    label.className = 'sr-only';
+                    label.htmlFor = `${field.name}_${rowCounter}`;
+                    label.textContent = 'Gender';
+                    
+                    const select = document.createElement('select');
+                    select.id = `${field.name}_${rowCounter}`;
+                    select.name = field.name;
+                    select.required = true;
+                    select.title = field.title;
+                    
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = "";
+                    defaultOption.textContent = "Select Gender";
+                    select.appendChild(defaultOption);
+                    
+                    ['Male', 'Female'].forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option;
+                        opt.textContent = option;
+                        select.appendChild(opt);
+                    });
+                    
+                    cell.appendChild(label);
+                    cell.appendChild(select);
+                } else {
+                    const label = document.createElement('label');
+                    label.className = 'sr-only';
+                    label.htmlFor = `${field.name}_${rowCounter}`;
+                    label.textContent = field.placeholder || field.title;
+                    
+                    const input = document.createElement('input');
+                    input.type = field.type;
+                    input.id = `${field.name}_${rowCounter}`;
+                    input.name = field.name;
+                    input.required = true;
+                    if (field.placeholder) input.placeholder = field.placeholder;
+                    if (field.title) input.title = field.title;
+                    if (field.pattern) input.pattern = field.pattern;
+                    if (field.min !== undefined) input.min = field.min;
+                    if (field.max !== undefined) input.max = field.max;
+                    if (field.step !== undefined) input.step = field.step;
+                    if (field.capitalize) {
+                        input.onkeyup = function() {
+                            this.value = capitalizeFirstLetter(this.value);
+                        };
+                    }
+                    
+                    cell.appendChild(label);
+                    cell.appendChild(input);
+                    
+                    if (field.unit) {
+                        const unitLabel = document.createElement('span');
+                        unitLabel.className = 'unit-label';
+                        unitLabel.textContent = field.unit;
+                        cell.appendChild(unitLabel);
+                    }
+                }
+            });
+            
+            rowCounter++;
+        }
+
+        function removeRow() {
+            const tbody = document.getElementById('studentBody');
+            if (tbody.rows.length > 1) {
+                tbody.deleteRow(-1);
+                rowCounter--;
+            }
+        }
+    </script>
 </body>
 </html>
-

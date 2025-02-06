@@ -1,14 +1,14 @@
 /* General Styles */
 body {
     background-color: #f4f4f4;
-    font-family: 'Poppins', sans-serif;
+    font-family: Muli, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     color: #333;
     padding: 20px;
 }
 
 /* Form Styling */
 form {
-    max-width: 700px;
+    max-width: 85%;
     margin: auto;
     background: #ffffff;
     padding: 20px;
@@ -25,33 +25,43 @@ label {
 }
 
 input, select {
-    width: 100%;
+    width: 95%;
     padding: 8px;
     margin-top: 4px;
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 14px;
     background: #fafafa;
+    border: none;
+
 }
 
 button {
-    background-color: #222;
+    font-family:sans-serif !important;
+    background-color: #333;
     color: #fff;
     padding: 10px 14px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 13px;
     transition: all 0.3s ease;
+    margin-top: 25px ;
+    margin-right: 20px;
 }
 
 button:hover {
     background-color: #555;
+    border: 3px solid black;
 }
 
 /* Table Styling */
+
+form table {
+    width: 90%;
+}
+
 table {
-    width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
     background: #ffffff;

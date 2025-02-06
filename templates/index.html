@@ -5,16 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Info</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
 </head>
 <body>
     <h2>Enter School Information</h2>
     <form action="/" method="post">
-        <label>Name: <input type="text" name="name" required></label><br>
-        <label>School: <input type="text" name="school" required></label><br>
-        <label>Number of Boys: <input type="number" name="num_boys" required></label><br>
-        <label>Number of Girls: <input type="number" name="num_girls" required></label><br>
+        <div class="form-group">
+            <label>Name: 
+                <input type="text" 
+                       name="name" 
+                       required 
+                       pattern="^[A-Za-z\s]+$"
+                       onkeyup="this.value = capitalizeFirstLetter(this.value)"
+                       title="Please enter letters only">
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <label>School: 
+                <input type="text" 
+                       name="school" 
+                       required
+                       pattern="^[A-Za-z0-9\s]+$"
+                       onkeyup="this.value = capitalizeFirstLetter(this.value)"
+                       title="Please enter letters and numbers only">
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <label>Number of Boys: 
+                <input type="number" 
+                       name="num_boys" 
+                       required 
+                       min="0" 
+                       max="9999"
+                       title="Please enter a number between 0 and 9999">
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <label>Number of Girls: 
+                <input type="number" 
+                       name="num_girls" 
+                       required 
+                       min="0" 
+                       max="9999"
+                       title="Please enter a number between 0 and 9999">
+            </label>
+        </div>
+        
         <button type="submit">Next</button>
     </form>
+
+    <script>
+        function capitalizeFirstLetter(string) {
+            return string.replace(/\b\w/g, c => c.toUpperCase());
+        }
+    </script>
 </body>
 </html>

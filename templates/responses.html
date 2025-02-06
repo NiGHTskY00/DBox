@@ -4,60 +4,93 @@
 
 <div class="table-container">
     <form method="POST">
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Question</th>
-                    <th>Correct</th>
-                    <th>Incorrect</th>
-                    <th>Partially Correct</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in students %}
+        {% for student in students %}
+            <h2> Good luck, {{ student.full_name }}</h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th scope="col">Question</th>
+                        <th scope="col">Correct</th>
+                        <th scope="col">Incorrect</th>
+                        <th scope="col">Partially Correct</th>
+                    </tr>
+                </thead>
+                <tbody>
                     {% for i in range(1, 21) %}
+                        {% set response = student_responses.get(student.student_id) %}
+                        {% set current_answer = response|getattr('Q' ~ i) if response else None %}
                         <tr>
-                            <td>{{ student.full_name }}</td>
-                            <td>Q{{ i }}</td>
-
-                            {% set response = student_responses.get(student.student_id) %}
-                            {% set current_answer = getattr(response, 'Q' ~ i, None) if response else None %}
-
+                            <td>Q.{{ i }}</td>
                             <td>
+                                <label for="correct_{{ i }}_{{ student.student_id }}" class="sr-only">
+                                    Correct answer for question {{ i }}
+                                </label>
                                 <input 
-                                    type="checkbox" 
-                                    name="correct_{{ i }}_{{ student.student_id }}" 
+                                    type="radio" 
+                                    name="response_{{ i }}_{{ student.student_id }}" 
+                                    value="1"
                                     id="correct_{{ i }}_{{ student.student_id }}"
-                                    {% if current_answer == 'correct' %} checked {% endif %}
-                                >
-                                <label for="correct_{{ i }}_{{ student.student_id }}">✔</label>
+                                    title="Mark as correct"
+                                    {% if current_answer == 1 %} checked {% endif %}>
                             </td>
-
                             <td>
+                                <label for="incorrect_{{ i }}_{{ student.student_id }}" class="sr-only">
+                                    Incorrect answer for question {{ i }}
+                                </label>
                                 <input 
-                                    type="checkbox" 
-                                    name="incorrect_{{ i }}_{{ student.student_id }}" 
+                                    type="radio" 
+                                    name="response_{{ i }}_{{ student.student_id }}" 
+                                    value="0"
                                     id="incorrect_{{ i }}_{{ student.student_id }}"
-                                    {% if current_answer == 'incorrect' %} checked {% endif %}
-                                >
-                                <label for="incorrect_{{ i }}_{{ student.student_id }}">❌</label>
+                                    title="Mark as incorrect"
+                                    {% if current_answer == 0 %} checked {% endif %}>
                             </td>
-
                             <td>
+                                <label for="partial_{{ i }}_{{ student.student_id }}" class="sr-only">
+                                    Partially correct answer for question {{ i }}
+                                </label>
                                 <input 
-                                    type="checkbox" 
-                                    name="partial_{{ i }}_{{ student.student_id }}" 
+                                    type="radio" 
+                                    name="response_{{ i }}_{{ student.student_id }}" 
+                                    value="0.5"
                                     id="partial_{{ i }}_{{ student.student_id }}"
-                                    {% if current_answer == 'partial' %} checked {% endif %}
-                                >
-                                <label for="partial_{{ i }}_{{ student.student_id }}">➖</label>
+                                    title="Mark as partially correct"
+                                    {% if current_answer == 0.5 %} checked {% endif %}>
                             </td>
                         </tr>
                     {% endfor %}
-                {% endfor %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+            <br>
+        {% endfor %}
         <button type="submit">Submit Responses</button>
     </form>
 </div>
+
+<style>
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+    /* Optional: style the tables to separate each student's block */
+    .table-container h2 {
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .table-container table {
+        width: 100%;
+        margin-bottom: 2rem;
+        border-collapse: collapse;
+    }
+    .table-container th,
+    .table-container td {
+        padding: 0.5rem;
+        text-align: center;
+    }
+</style>
